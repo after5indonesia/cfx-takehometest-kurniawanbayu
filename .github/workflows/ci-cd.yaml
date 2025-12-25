@@ -27,13 +27,21 @@ jobs:
       with:
         fetch-depth: 2 # Required to check changes
 
-    # Only run if files in the specific service directory changed
     - name: Check for changes
       id: check_changes
       run: |
-        if git diff --name-only HEAD^ HEAD | grep "services/${{ matrix.service }}/"; then
+        # ALWAYS build if triggered manually
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          echo "Manual trigger detected: Forcing build."
           echo "changed=true" >> $GITHUB_OUTPUT
+        
+        # Otherwise, check Git history for changes
+        elif git diff --name-only HEAD^ HEAD | grep "services/${{ matrix.service }}/"; then
+          echo "Changes detected in ${{ matrix.service }}."
+          echo "changed=true" >> $GITHUB_OUTPUT
+          
         else
+          echo "No changes in ${{ matrix.service }}."
           echo "changed=false" >> $GITHUB_OUTPUT
         fi
 
