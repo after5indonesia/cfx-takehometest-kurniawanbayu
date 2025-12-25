@@ -34,8 +34,3 @@ The pipeline is defined in `.github/workflows/ci-cd.yaml`.
 3.  **Access Services (Publicly via xip.io):**
     * **Go Service:** `http://go.127.0.0.1.xip.io`
     * **Node Service:** `http://node.127.0.0.1.xip.io`
-
-## 📊 Monitoring (Bonus)
-A sample Prometheus configuration is included in `k8s/monitoring`.
-* **Approach:** Prometheus is configured to scrape pods labeled `go-app` or `node-app` to gather runtime metrics.
-* **Logging:** In a production environment, I would deploy a Fluentd daemonset to collect container logs from `/var/log/containers` and forward them to Elasticsearch.
