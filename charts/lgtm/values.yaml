@@ -1,0 +1,49 @@
+# 1. Configure Grafana to Auto-Discover Datasources
+grafana:
+  enabled: true
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          uid: prometheus
+          url: http://lgtm-stack-prometheus-server
+          access: proxy
+          isDefault: true
+        - name: Loki
+          type: loki
+          uid: loki
+          url: http://lgtm-stack-loki:3100
+          access: proxy
+        - name: Tempo
+          type: tempo
+          uid: tempo
+          url: http://lgtm-stack-tempo:3100
+          access: proxy
+
+# 2. Configure Loki (Single Binary for simple setups)
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 1
+  storage:
+    type: 'filesystem'
+
+# 3. Configure Promtail (Log Collector)
+promtail:
+  enabled: true
+  config:
+    clients:
+      - url: http://lgtm-stack-loki:3100/loki/api/v1/push
+
+# 4. Configure Tempo (Tracing)
+tempo:
+  enabled: true
+
+# 5. Configure Prometheus (Metrics)
+prometheus:
+  enabled: true
+  server:
+    persistentVolume:
+      enabled: false # Turn off PV for easier testing on Minikube

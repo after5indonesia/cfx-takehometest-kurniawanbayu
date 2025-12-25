@@ -68,11 +68,23 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # In a real scenario, you would set KUBECONFIG here
-    # For this submission, we validate manifests or use a dry-run
-    - name: Simulate K8s Deployment
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.11.1
+
+    - name: Deploy Go App (Dry Run)
       run: |
-        echo "Connecting to Kubernetes Cluster..."
-        echo "Applying manifests..."
-        # kubectl apply -f deployment/
-        echo "Deployment sent to cluster."
+        helm upgrade --install go-app ./charts/microservice \
+          --set image.repository=${{ env.REGISTRY }}/${{ env.repo_owner }}/go-app \
+          --set image.tag=${{ github.sha }} \
+          --set service.targetPort=8080 \
+          --dry-run
+
+    - name: Deploy Node App (Dry Run)
+      run: |
+        helm upgrade --install node-app ./charts/microservice \
+          --set image.repository=${{ env.REGISTRY }}/${{ env.repo_owner }}/node-app \
+          --set image.tag=${{ github.sha }} \
+          --set service.targetPort=3000 \
+          --dry-run
